@@ -1,0 +1,45 @@
+# ── Python ───────────────────────────────────────────────
+__pycache__/
+*.py[cod]
+*.pyo
+*.pyd
+.Python
+*.egg-info/
+dist/
+build/
+.eggs/
+
+# ── Virtual environments ──────────────────────────────────
+.venv/
+venv/
+env/
+ENV/
+
+# ── FastAPI / backend ─────────────────────────────────────
+backend/data/          # CIFAR-10 downloaded dataset (~170 MB)
+backend/static/figures/*.png  # generated run figures
+
+# ── Node / frontend ───────────────────────────────────────
+node_modules/
+frontend/dist/
+frontend/.vite/
+
+# ── Environment variables ─────────────────────────────────
+.env
+.env.local
+.env.*.local
+
+# ── OS ────────────────────────────────────────────────────
+.DS_Store
+Thumbs.db
+desktop.ini
+
+# ── Editors ───────────────────────────────────────────────
+.vscode/
+.idea/
+*.swp
+*.swo
+
+# ── Logs ─────────────────────────────────────────────────
+*.log
+uvicorn.log
