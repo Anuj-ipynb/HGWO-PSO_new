@@ -24,8 +24,11 @@ export default function ResultsSection({ status }) {
 
   const best = status?.best_accuracy ?? 0
 
+  const baseURL = "http://127.0.0.1:8000"
+
   return (
     <div className="space-y-6 animate-fadein">
+
       {/* Metric cards */}
       <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
         {[
@@ -47,78 +50,88 @@ export default function ResultsSection({ status }) {
           <h3 className="font-display text-xs font-semibold text-neon uppercase tracking-widest">
             Convergence Curve
           </h3>
-          <span className="text-xs font-mono text-muted/60">HGWO-PSO · {convData.length} iterations</span>
+          <span className="text-xs font-mono text-muted/60">
+            HGWO-PSO · {convData.length} iterations
+          </span>
         </div>
+
         <ResponsiveContainer width="100%" height={240}>
-          <LineChart data={convData} margin={{ top: 5, right: 10, bottom: 5, left: 0 }}>
+          <LineChart data={convData}>
             <CartesianGrid strokeDasharray="3 3" stroke="#1F2937" />
-            <XAxis
-              dataKey="iter"
-              stroke="#4B5563"
-              tick={{ fontSize: 10, fontFamily: 'JetBrains Mono', fill: '#6B7280' }}
-              label={{ value: 'Iteration', position: 'insideBottom', offset: -2, fill: '#6B7280', fontSize: 10 }}
-            />
-            <YAxis
-              stroke="#4B5563"
-              tick={{ fontSize: 10, fontFamily: 'JetBrains Mono', fill: '#6B7280' }}
-              domain={[0, 100]}
-              tickFormatter={(v) => `${v}%`}
-            />
+            <XAxis dataKey="iter" stroke="#4B5563" />
+            <YAxis domain={[0, 100]} tickFormatter={(v) => `${v}%`} />
             <Tooltip content={<CustomTooltip />} />
-            <ReferenceLine
-              y={best * 100}
-              stroke="#7C3AED"
-              strokeDasharray="4 4"
-              strokeOpacity={0.6}
-            />
+            <ReferenceLine y={best * 100} stroke="#7C3AED" strokeDasharray="4 4" />
             <Line
               type="monotone"
               dataKey="accuracy"
               stroke="#00E5FF"
               strokeWidth={2.5}
-              dot={{ fill: '#7C3AED', r: 4, strokeWidth: 0 }}
-              activeDot={{ r: 6, fill: '#00E5FF', strokeWidth: 2, stroke: '#0B0F14' }}
             />
           </LineChart>
         </ResponsiveContainer>
       </div>
 
-      {/* Server-rendered matplotlib figures */}
-      {status.figures?.convergence && (
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-          <div className="glass-card p-4">
-            <p className="text-xs font-mono text-muted uppercase tracking-wider mb-3">
-              Matplotlib · Convergence
-            </p>
-            <img
-              src={status.figures.convergence}
-              alt="convergence"
-              className="w-full rounded-lg"
-            />
-          </div>
-          <div className="glass-card p-4">
-            <p className="text-xs font-mono text-muted uppercase tracking-wider mb-3">
-              Matplotlib · Accuracy Distribution
-            </p>
-            <img
-              src={status.figures.boxplot}
-              alt="boxplot"
-              className="w-full rounded-lg"
-            />
-          </div>
+      {/* 🔥 ALL MATPLOTLIB FIGURES */}
+      {status?.figures && (
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+
+          {/* 📈 Convergence */}
+          {status.figures.convergence && (
+            <div className="glass-card p-4">
+              <p className="text-xs font-mono text-muted mb-3">📈 Convergence (Matplotlib)</p>
+              <img
+                src={`${baseURL}/${status.figures.convergence}`}
+                className="w-full rounded-lg border border-gray-700"
+              />
+            </div>
+          )}
+
+          {/* 📦 Boxplot */}
+          {status.figures.boxplot && (
+            <div className="glass-card p-4">
+              <p className="text-xs font-mono text-muted mb-3">📦 Accuracy Distribution</p>
+              <img
+                src={`${baseURL}/${status.figures.boxplot}`}
+                className="w-full rounded-lg border border-gray-700"
+              />
+            </div>
+          )}
+
+          {/* 📊 Comparison */}
+          {status.figures.comparison && (
+            <div className="glass-card p-4">
+              <p className="text-xs font-mono text-muted mb-3">📊 Optimization vs Final</p>
+              <img
+                src={`${baseURL}/${status.figures.comparison}`}
+                className="w-full rounded-lg border border-gray-700"
+              />
+            </div>
+          )}
+
+          {/* 📉 Loss */}
+          {status.figures.loss && (
+            <div className="glass-card p-4">
+              <p className="text-xs font-mono text-muted mb-3">📉 Loss Curve</p>
+              <img
+                src={`${baseURL}/${status.figures.loss}`}
+                className="w-full rounded-lg border border-gray-700"
+              />
+            </div>
+          )}
+
         </div>
       )}
 
-      {/* Best hyperparameters note */}
+      {/* Summary */}
       <div className="glass-card p-5">
-        <p className="text-xs font-mono text-muted uppercase tracking-wider mb-3">Optimization Complete</p>
-        <p className="text-sm text-text/80 font-body">
-          HGWO-PSO converged after <span className="text-neon font-mono">{status.total_iterations}</span> iterations
-          across <span className="text-neon font-mono">{status.all_accuracies?.length}</span> candidate evaluations.
-          Best validation accuracy achieved:{' '}
-          <span className="text-neon font-mono font-semibold">{(best * 100).toFixed(2)}%</span> on CIFAR-10 subset.
+        <p className="text-xs font-mono text-muted mb-3">Optimization Complete</p>
+        <p className="text-sm text-text/80">
+          HGWO-PSO converged after <span className="text-neon">{status.total_iterations}</span> iterations.
+          Final accuracy: <span className="text-neon font-semibold">{(best * 100).toFixed(2)}%</span>
         </p>
       </div>
+
     </div>
   )
 }

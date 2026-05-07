@@ -54,3 +54,38 @@ async def get_status(run_id: str):
     if state is None:
         raise HTTPException(status_code=404, detail="Run not found")
     return RunStatus(**state)
+
+# 🔥 FINAL TRAINING ENDPOINT
+from app.optimizers.cnn_trainer import evaluate_candidate
+
+@router.get("/final-train")   # use GET for easy browser demo
+async def final_train():
+    best_hp = {
+        "lr": 0.0036,
+        "batch_size": 32,
+        "dropout": 0.29,
+        "filters1": 32,
+        "filters2": 96,
+        "filters3": 64,
+        "dense_units": 304
+    }
+
+    acc = evaluate_candidate(best_hp, epochs=30)
+
+    run_id = "final_run"
+
+    run_store[run_id] = {
+        "status": "completed",
+        "progress": 100,
+        "iteration": 1,
+        "total_iterations": 1,
+        "best_accuracy": acc,
+        "convergence": [acc],
+        "all_accuracies": [],
+        "figures": {},
+        "elapsed_seconds": 0,
+        "error": None,
+        "best_params": best_hp
+    }
+
+    return {"run_id": run_id, "accuracy": acc}

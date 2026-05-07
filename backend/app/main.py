@@ -1,6 +1,5 @@
 """
 main.py — FastAPI entrypoint for HGWO-PSO optimization engine.
-Serves REST API + static figure files.
 """
 
 import uuid
@@ -16,9 +15,7 @@ from app.services.run_store import run_store
 
 @asynccontextmanager
 async def lifespan(app: FastAPI):
-    # Startup: nothing heavy here — we do not pre-load the model
     yield
-    # Shutdown cleanup
     run_store.clear()
 
 
@@ -30,13 +27,18 @@ app = FastAPI(
 
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=["*"],          # Dev-only; tighten in production
+    allow_origins=["*"],
     allow_credentials=True,
     allow_methods=["*"],
     allow_headers=["*"],
 )
 
-# Serve generated figures as static files
-app.mount("/figures", StaticFiles(directory="static/figures"), name="figures")
+# ✅ FIXED STATIC MOUNT
+app.mount("/static", StaticFiles(directory="static"), name="static")
 
 app.include_router(optimize.router, prefix="/api/v1")
+
+
+@app.get("/")
+def home():
+    return {"message": "API is working 🚀"}

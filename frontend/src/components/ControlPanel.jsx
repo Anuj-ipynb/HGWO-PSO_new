@@ -5,9 +5,9 @@ const FIELDS = [
     key: 'epochs',
     label: 'Training Epochs',
     hint: 'per candidate',
-    min: 1,
-    max: 5,
-    tip: 'Higher = more accurate but slower',
+    min: 0,
+    max: 30,   // 🚀 FIXED (was 5)
+    tip: 'Higher = more accurate but slower (recommended: 10–20)',
   },
   {
     key: 'population',
@@ -35,31 +35,42 @@ function NumberField({ field, value, onChange }) {
           {field.label}
           <span className="ml-2 text-neon/50 normal-case">{field.hint}</span>
         </label>
-        <span className="text-xs text-muted/60 font-mono">{field.min}–{field.max}</span>
+        <span className="text-xs text-muted/60 font-mono">
+          {field.min}–{field.max}
+        </span>
       </div>
+
       <input
         type="number"
         min={field.min}
         max={field.max}
         value={value}
-        onChange={(e) => onChange(Math.min(field.max, Math.max(field.min, +e.target.value)))}
+        onChange={(e) => {
+          const val = Number(e.target.value)
+          if (!isNaN(val)) {
+            onChange(val)   // ✅ no hard clamp (backend handles validation)
+          }
+        }}
         className="w-full bg-bg-dark border border-neon/20 rounded-lg px-3 py-2.5
           text-text font-mono text-sm focus:outline-none focus:border-neon/60
           focus:shadow-neon transition-all duration-200"
       />
+
       <p className="text-xs text-muted/50 font-body">{field.tip}</p>
     </div>
   )
 }
 
 export default function ControlPanel({ config, setConfig, onStart, loading }) {
-  const update = (key) => (val) => setConfig((c) => ({ ...c, [key]: val }))
+  const update = (key) => (val) =>
+    setConfig((c) => ({ ...c, [key]: val }))
 
   const totalEvals = config.population * config.iterations
   const estSeconds = Math.round(totalEvals * config.epochs * 4)
 
   return (
     <div className="glass-card p-6 space-y-5 animate-fadein">
+      {/* Header */}
       <div className="flex items-center justify-between">
         <h3 className="font-display text-xs font-semibold text-neon uppercase tracking-widest">
           Control Panel
@@ -69,13 +80,21 @@ export default function ControlPanel({ config, setConfig, onStart, loading }) {
         </span>
       </div>
 
+      {/* Input Fields */}
       {FIELDS.map((f) => (
-        <NumberField key={f.key} field={f} value={config[f.key]} onChange={update(f.key)} />
+        <NumberField
+          key={f.key}
+          field={f}
+          value={config[f.key]}
+          onChange={update(f.key)}
+        />
       ))}
 
-      {/* Hyperparameter tags */}
+      {/* Search Space Tags */}
       <div>
-        <p className="text-xs font-mono text-muted uppercase tracking-wider mb-2">Search Space (7D)</p>
+        <p className="text-xs font-mono text-muted uppercase tracking-wider mb-2">
+          Search Space (7D)
+        </p>
         <div className="flex flex-wrap gap-1.5">
           {['lr', 'batch', 'dropout', 'f1', 'f2', 'f3', 'dense'].map((hp) => (
             <span
@@ -88,6 +107,7 @@ export default function ControlPanel({ config, setConfig, onStart, loading }) {
         </div>
       </div>
 
+      {/* Start Button */}
       <button
         onClick={onStart}
         disabled={loading}
@@ -100,7 +120,7 @@ export default function ControlPanel({ config, setConfig, onStart, loading }) {
             Optimizing…
           </span>
         ) : (
-          '▶  Start Optimization'
+          '▶ Start Optimization'
         )}
       </button>
     </div>

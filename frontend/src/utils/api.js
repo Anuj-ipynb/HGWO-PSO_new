@@ -1,17 +1,15 @@
-const BASE = '/api/v1'
+const BASE_URL = "http://127.0.0.1:8000"
 
-export async function startOptimization(params) {
-  const res = await fetch(`${BASE}/optimize`, {
-    method: 'POST',
-    headers: { 'Content-Type': 'application/json' },
-    body: JSON.stringify(params),
+export const startOptimization = async (config) => {
+  const res = await fetch(`${BASE_URL}/api/v1/optimize`, {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify(config),
   })
-  if (!res.ok) throw new Error(`Server error ${res.status}`)
   return res.json()
 }
 
-export async function fetchStatus(runId) {
-  const res = await fetch(`${BASE}/status/${runId}`)
-  if (!res.ok) throw new Error(`Status error ${res.status}`)
+export const fetchStatus = async (runId) => {
+  const res = await fetch(`${BASE_URL}/api/v1/status/${runId}`)
   return res.json()
 }

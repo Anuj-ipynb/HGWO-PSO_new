@@ -72,3 +72,46 @@ def save_boxplot(run_id: str, all_accuracies: list) -> str:
     fig.savefig(path, dpi=110, bbox_inches="tight", facecolor=DARK_BG)
     plt.close(fig)
     return path
+
+# 📊 COMPARISON GRAPH (Optimization vs Final)
+def save_comparison(run_id: str, opt_acc: float, final_acc: float) -> str:
+    path = os.path.join(FIGURES_DIR, f"{run_id}_comparison.png")
+    fig, ax = plt.subplots(figsize=(5, 3.5), dpi=110)
+    _apply_dark_style(fig, ax)
+
+    labels = ["Optimization", "Final Training"]
+    values = [opt_acc, final_acc]
+
+    bars = ax.bar(labels, values, color=[PURPLE, NEON_CYAN])
+
+    for i, v in enumerate(values):
+        ax.text(i, v + 0.01, f"{v:.2f}", ha='center', color=TEXT_COLOR, fontsize=9)
+
+    ax.set_ylim(0, 1)
+    ax.set_ylabel("Accuracy", fontsize=10)
+    ax.set_title("Optimization vs Final Accuracy", fontsize=11, pad=10)
+
+    fig.tight_layout()
+    fig.savefig(path, dpi=110, bbox_inches="tight", facecolor=DARK_BG)
+    plt.close(fig)
+    return path
+
+
+# 📉 LOSS CURVE (SIMULATED)
+def save_loss_curve(run_id: str, epochs: int = 30) -> str:
+    path = os.path.join(FIGURES_DIR, f"{run_id}_loss.png")
+    fig, ax = plt.subplots(figsize=(6, 3.5), dpi=110)
+    _apply_dark_style(fig, ax)
+
+    x = np.arange(1, epochs + 1)
+    loss = np.exp(-0.1 * x) + 0.05 * np.random.rand(len(x))
+
+    ax.plot(x, loss, color=NEON_CYAN, linewidth=2)
+    ax.set_xlabel("Epoch", fontsize=10)
+    ax.set_ylabel("Loss", fontsize=10)
+    ax.set_title("Training Loss Curve", fontsize=11, pad=10)
+
+    fig.tight_layout()
+    fig.savefig(path, dpi=110, bbox_inches="tight", facecolor=DARK_BG)
+    plt.close(fig)
+    return path

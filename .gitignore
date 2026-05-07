@@ -43,3 +43,12 @@ desktop.ini
 # ── Logs ─────────────────────────────────────────────────
 *.log
 uvicorn.log
+backend/data/
+venv/
+__pycache__/
+static/figures/
+backend/data/
+backend/static/figures/
+venv/
+__pycache__/
+*.pyc
